@@ -153,10 +153,62 @@ let addProduct = (res,product)=>{
         })
 }
 
+//fetch any block using id
+let viewProductDetail = (id,res)=>{
+    bdbOrm.models.products
+    .retrieve(id)
+    .then(blocks => {
+        // assets is an array of products
+        block = blocks[0].transactionHistory;
+        res.send({
+            asset : block.asset,
+            meta : block.data,
+            id : block.id
+        });
+    })
+}
+
+//to fetch all prodcucts
+let viewAllProduct = (res)=>{
+    bdbOrm
+    .models
+    .products
+    .retrieve()
+    .then(assets => {
+        res.send(assets.map(asset => asset.id));
+    })
+}
+
+//update all products
+let updateProduct = (res,updates,keys,id)=>{
+    bdbOrm.models.products
+    .retrieve(id)
+    .then(asset => {
+        // lets append update the data of our asset
+        // since we use a blockchain, we can only append
+        asset.append({
+            toPublicKey: keys.publicKey,
+            keypair: keys,
+            data: {
+                timeline : {
+                    to : updates.to,
+                    from : udpates.from,
+                    timestamp : updates.timestamp
+                }
+             }
+        })
+    })   
+    .then(updatedAsset => {
+        // updatedAsset contains the last (unspent) state
+        Common.sendResponse(res,0,'Updates done!');
+    })
+}
+
 module.exports = {
     createKeys : createKeys,
     addCompany : addCompany,
-    addProduct : addProduct
-    // updateCompany : updateProduct,
-    // updateProduct : updateProduct
+    addProduct : addProduct,
+    viewProductDetail : viewProductDetail,
+    viewAllProduct : viewAllProduct,
+    updateProduct : updateProduct
 }

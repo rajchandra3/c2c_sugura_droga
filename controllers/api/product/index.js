@@ -3,8 +3,13 @@ var router = express.Router();
 var Controller = require('./controller')
 
 //to show any product
-router.get('/view', (req, res)=> {
+router.get('/details', (req, res)=> {
   Controller.show1Product(req,res);
+});
+
+//to show any product
+router.get('/fetch', (req, res)=> {
+  Controller.showAllProducts(req,res);
 });
 
 //add new product

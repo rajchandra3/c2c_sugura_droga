@@ -12,7 +12,7 @@ exports.verify = (req,res)=>{
             Common.sendResponse(res,1,'Counterfeit Product! Please contact the concerned authorities');
         }else {
             if(rfid === data.rfid && key === data.key){
-                Product.findOne({publicKey : publicKey},(err,productData)=>{
+                Product.findOne({publicKey : key},(err,productData)=>{
                     if(err){
                         Common.sendResponse(res,1,'Error while fetching the product details');
                     }else{
@@ -25,8 +25,7 @@ exports.verify = (req,res)=>{
                                 on : productData.on,
                                 for : productData.for,
                                 expires : productData.expires
-                            },
-                            timeline : timeline
+                            }
                         })
                     }
                 })

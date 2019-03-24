@@ -3,7 +3,7 @@ const Product = require('./schema');
 const bc = require('./../../db/setup')
 
 exports.addProduct = (req,res)=>{
-    Product.create({
+    Product.create({ 
         name : req.body.name,
         manufactured : {
             by : req.body.by,
@@ -21,9 +21,30 @@ exports.addProduct = (req,res)=>{
 }
 
 exports.updateProduct = (req,res)=>{
+    let updates = {
+        to : req.body.to,
+        from : req.body.from,
+        timestamp : req.body.timestamp
+    };
+    let id = req.body.id;
+    Product.findOne({id : id},(err,data)=>{
+        if(err){
+            Common.sendResponse(res,1,'Something went wrong!');
+        }else{
+            bc.updateProduct(res,updates,id,{
+                publicKey : data.publicKey,
+                privateKey : data.privateKey
+            });
+        }
+    })
 
 }
 
 exports.show1Product = (req,res)=>{
+    let id = req.query.id;
+    bc.viewProductDetail(id,res);
+}
 
+exports.showAllProducts = (req,res)=>{
+    bc.viewAllProduct(res);
 }

@@ -4,22 +4,25 @@ const Company = require('./schema');
 const bc = require('./../../db/setup');
 
 exports.getCompanyLogin = (req,res)=>{
-    console.log(req.body)
-    uname = req.body.uname.trim(),
-    password = req.body.password
+    let uname = req.body.uname;
+    let password = req.body.password;
     if(!uname || !password){
         Common.sendResponse(res,1,`Username or Password can't be empty!`);
     }else{
         Company.findOne({uname : uname})
         .then((companyData)=>{
-            if(companyData.password === password){
-                //login successfull
-                Auth.generateToken(companyData, (token)=>{
-                    Common.sendResponse1Custom(res,0,'Login Successful',{cookie : token});
-                })
+            if(!companyData){
+                Common.sendResponse(res,1,'Company is not registered with us!');
             }else{
-                //invalid credentials
-                Common.sendResponse(res,1,'Invalid username or password');
+                if(companyData.password === password){
+                    //login successfull
+                    Auth.generateToken(companyData, (token)=>{
+                        Common.sendResponse1Custom(res,0,'Login Successful',{cookie : `Bearer ${token}`});
+                    })
+                }else{
+                    //invalid credentials
+                    Common.sendResponse(res,1,'Invalid username or password');
+                }
             }
         })
     } 

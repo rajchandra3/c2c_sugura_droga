@@ -26,10 +26,7 @@ app.use(function(req, res, next) {
   if(allowedOrigins.indexOf(origin) > -1){
       res.header('Access-Control-Allow-Origin', origin);
   }
-  res.header('Connection','keep-alive');
-  res.header('Keep-Alive','timeout=200');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header('content-type', 'application/json');
 
   if (req.method === 'OPTIONS') {
       var headers = {
