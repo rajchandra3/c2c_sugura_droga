@@ -1,15 +1,20 @@
 const BigchainDB = require('bigchaindb-driver')
 const bip39 = require('bip39')
 const Orm = require('bigchaindb-orm').default;
+const request = require('request')
+
+
 const API_PATH = 'https://test.bigchaindb.com/api/v1/';
 const bdbOrm = new Orm(API_PATH);
 const conn = new BigchainDB.Connection(API_PATH);
+
 bdbOrm.define("companies", "https://schema.org/v1/companies");
 bdbOrm.define("products", "https://schema.org/v1/products");
 
 const Company = require('./../api/company/schema');
 const Product = require('./../api/product/schema');
 const Transaction = require('./../api/transaction/schema');
+const Validate = require('./../api/validation/schema');
 
 const Common = require('./../api/utilities/responses')
 
@@ -89,10 +94,10 @@ let addProduct = (res,product)=>{
         {
             cost : product.cost,
             manufactured : {
-                by : product.by,
-                on : product.on,
-                for : product.for,
-                expires : product.expires
+                by : product.manufactured.by,
+                on : product.manufactured.on,
+                for : product.manufactured.for,
+                expires : product.manufactured.expires
             },
             timestamp: Date.now(),
             timeline : []
@@ -118,11 +123,28 @@ let addProduct = (res,product)=>{
             },(err,done)=>{
                 if(!err && done){
                     //send rfid to aman
-                    console.log(`${productKeys.publicKey} being sent to aman`)
-                    //send response
-                    Common.sendResponse1Custom(res,0,`Product added successfully`,{
-                        transaction_id : `did:${txSigned.id}`
-                    })
+                    request({
+                        url:`${process.env.API}/temp`,
+                        method: "POST",
+                        form: {
+                            cmd: "write",
+                            key: productKeys.publicKey
+                        }},
+                        (err, response, body)=> {
+                        if (err) {
+                            Common.sendResponse(res,1,'Error sending key to rfid scanner');
+                        }else{
+                            Common.sendResponse1Custom(res,0,`Product added successfully`,{
+                                transaction_id : `did:${txSigned.id}`
+                            })
+                            //map rfid to public key
+                            let id = body.replace(' ','');
+                            Validate.create({
+                                key : productKeys.publicKey,
+                                rfid : id
+                            })
+                        }
+                      });
                 }else{
                     //send response
                     Common.sendResponse(res,1,`Problem while adding the product`);

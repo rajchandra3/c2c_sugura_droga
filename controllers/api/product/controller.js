@@ -6,9 +6,11 @@ exports.addProduct = (req,res)=>{
     Product.create({
         name : req.body.name,
         manufactured : {
-            by : req.body.manufactured.by,
-            for : req.body.rfid
-        }
+            by : req.body.by,
+            for : req.body.rfid,
+            expires : req.body.expires
+        },
+        cost : req.body.cost
     },(err,data)=>{
         if(err){
             Common.sendResponse(res,1,'Error adding new Product');

@@ -10,6 +10,7 @@ require('./controllers/db/setup');
 var companyRouter = require('./controllers/api/company/index');
 var productRouter = require('./controllers/api/product/index');
 var transactionRouter = require('./controllers/api/transaction/index');
+var pocRouter = require('./controllers/api/validation/index'); //proof of concept router
 
 var app = express();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/company', companyRouter);
 app.use('/product', productRouter);
 app.use('/transaction', transactionRouter);
+app.use('/poc', pocRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
