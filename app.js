@@ -7,16 +7,14 @@ require('dotenv').config();
 require('./controllers/db/connection');
 require('./controllers/db/setup');
 
+var auth = require('./controllers/api/utilities/auth')
+
 var companyRouter = require('./controllers/api/company/index');
 var productRouter = require('./controllers/api/product/index');
 var transactionRouter = require('./controllers/api/transaction/index');
 var pocRouter = require('./controllers/api/validation/index'); //proof of concept router
 
 var app = express();
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 //to get rid of the CORS issue
 app.use(function(req, res, next) {
@@ -32,6 +30,7 @@ app.use(function(req, res, next) {
   res.header('Keep-Alive','timeout=200');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.header('content-type', 'application/json');
+
   if (req.method === 'OPTIONS') {
       var headers = {
           "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
@@ -43,6 +42,10 @@ app.use(function(req, res, next) {
       next();
   }
 });
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use('/company', companyRouter);
 app.use('/product', productRouter);
