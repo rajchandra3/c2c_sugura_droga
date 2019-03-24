@@ -18,7 +18,7 @@ router.post('/add', (req, res)=> {
 });
 
 //update product
-router.get('/update', (req, res)=> {
+router.post('/update', (req, res)=> {
   Controller.updateProduct(req,res);
 }); 
 

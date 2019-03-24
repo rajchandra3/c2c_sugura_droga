@@ -30,11 +30,13 @@ exports.updateProduct = (req,res)=>{
     Product.findOne({id : id},(err,data)=>{
         if(err){
             Common.sendResponse(res,1,'Something went wrong!');
-        }else{
+        }else if(data){
             bc.updateProduct(res,updates,id,{
                 publicKey : data.publicKey,
                 privateKey : data.privateKey
             });
+        }else{
+            Common.sendResponse(res,1,'Couldn\'t find the product');
         }
     })
 
@@ -46,5 +48,14 @@ exports.show1Product = (req,res)=>{
 }
 
 exports.showAllProducts = (req,res)=>{
-    bc.viewAllProduct(res);
+    // bc.viewAllProduct(res);
+    Product.find({},(err,products)=>{
+        if(err){
+            Common.sendResponse(res,1,'Error finding all products');
+        }else{
+            Common.sendResponse1Custom(res,0,'Serving all products!',{
+                products : products
+            });
+        }
+    })
 }

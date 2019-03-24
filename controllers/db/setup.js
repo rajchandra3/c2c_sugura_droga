@@ -153,16 +153,17 @@ let addProduct = (res,product)=>{
         })
 }
 
-//fetch any block using id
+//fetch any block using id`
 let viewProductDetail = (id,res)=>{
     bdbOrm.models.products
     .retrieve(id)
     .then(blocks => {
+        console.log(blocks);
         // assets is an array of products
-        block = blocks[0].transactionHistory;
+        block = blocks[0].transactionHistory[0];
         res.send({
             asset : block.asset,
-            meta : block.data,
+            meta : blocks[0].data,
             id : block.id
         });
     })
@@ -180,28 +181,40 @@ let viewAllProduct = (res)=>{
 }
 
 //update all products
-let updateProduct = (res,updates,keys,id)=>{
-    bdbOrm.models.products
-    .retrieve(id)
-    .then(asset => {
-        // lets append update the data of our asset
-        // since we use a blockchain, we can only append
-        asset.append({
-            toPublicKey: keys.publicKey,
-            keypair: keys,
-            data: {
+let updateProduct = (res,updates,id,keys)=>{
+    Product.updateOne({id : id},
+        {
+            $push : {
                 timeline : {
                     to : updates.to,
-                    from : udpates.from,
+                    from : updates.from,
                     timestamp : updates.timestamp
                 }
-             }
-        })
-    })   
-    .then(updatedAsset => {
-        // updatedAsset contains the last (unspent) state
-        Common.sendResponse(res,0,'Updates done!');
+            }
+        },(e,done)=>{
+            Common.sendResponse(res,e?1:0,done?'Success':'Error');
     })
+    // bdbOrm.models.products
+    // .retrieve(id)
+    // .then(asset => {
+    //     // lets append update the data of our asset
+    //     // since we use a blockchain, we can only append
+    //     asset.append({
+    //         toPublicKey: keys.publicKey,
+    //         keypair: keys,
+    //         data: {
+    //             timeline : {
+    //                 to : updates.to,
+    //                 from : udpates.from,
+    //                 timestamp : updates.timestamp
+    //             }
+    //          }
+    //     })
+    // })   
+    // .then(updatedAsset => {
+        // updatedAsset contains the last (unspent) state
+        
+//     })
 }
 
 module.exports = {
