@@ -18,6 +18,32 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//to get rid of the CORS issue
+app.use(function(req, res, next) {
+  var allowedOrigins = [
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'http://localhost:5000'];
+  var origin = req.headers.origin;
+  if(allowedOrigins.indexOf(origin) > -1){
+      res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Connection','keep-alive');
+  res.header('Keep-Alive','timeout=200');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header('content-type', 'application/json');
+  if (req.method === 'OPTIONS') {
+      var headers = {
+          "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
+          "Access-Control-Allow-Credentials" : true
+      };
+      res.writeHead(200, headers);
+      res.end();
+  } else {
+      next();
+  }
+});
+
 app.use('/company', companyRouter);
 app.use('/product', productRouter);
 app.use('/transaction', transactionRouter);
